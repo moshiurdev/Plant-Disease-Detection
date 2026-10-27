@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: step 1 of the plan (data checked, nothing trained yet). No results are reported here until they are measured.**
+**Status: steps 1–2 of the plan done (data checked, PlantVillage baselines trained). Field and rice results come in later steps; nothing is reported here until it is measured.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -44,9 +44,12 @@ Same standard as my earlier projects: splits that keep related images apart,
 model selection on validation data only, and every number in this README
 measured by a script in this repository.
 
-- **PlantVillage:** several photos exist of the same physical leaf. Splits use the
-  official leaf-grouped train/test lists, and the validation set is carved out
-  of train by leaf ID, never by image.
+- **PlantVillage:** several photos exist of the same physical leaf, and the
+  official leaf map covers only 76% of images. Photos of the same leaf are
+  found by thumbnail correlation plus keypoint matching, grouped, and the
+  groups are split 70/15/15 (train/val/test) so no leaf is on two sides
+  ([docs/splits.md](docs/splits.md)). Measured this way, the official split
+  puts about 5% of its test images on leaves that are also in train.
 - **PlantDoc:** its official test set is the field test set. PlantDoc is never
   used for model selection in question 1. Images in PlantDoc test that are near
   copies of PlantDoc train images or of PlantVillage images are reported and
@@ -56,6 +59,24 @@ measured by a script in this repository.
   photos are kept in the same fold.
 - **Metrics:** accuracy and macro-F1 (classes are imbalanced), per-class recall
   and confusion matrices.
+
+## Results so far
+
+### PlantVillage, in-domain (step 2)
+
+Leaf-grouped test split, 8,158 images, 38 classes. 160 px input, 6 epochs, one
+seed. The best epoch and the best model were chosen on validation macro-F1.
+Details and error analysis: [docs/results_pv.md](docs/results_pv.md).
+
+| Model | Params | Test accuracy [95% CI] | Test macro-F1 [95% CI] |
+|---|---:|---|---|
+| ResNet-18 | 11.2 M | 0.9940 [0.9923, 0.9956] | 0.9913 [0.9884, 0.9940] |
+| MobileNetV3-Large | 4.3 M | 0.9950 [0.9934, 0.9964] | 0.9932 [0.9908, 0.9953] |
+| **EfficientNet-B0** (selected on val) | 4.1 M | **0.9972 [0.9960, 0.9983]** | **0.9956 [0.9936, 0.9975]** |
+
+Lab photos are easy, so near-100% scores are expected here. The main
+remaining error is between the two corn leaf-spot diseases. These numbers say
+nothing yet about field photos; that is step 3.
 
 ## Plan
 
@@ -72,13 +93,24 @@ measured by a script in this repository.
 
 Hardware: Apple M1, 8 GB RAM (PyTorch MPS for training, ONNX Runtime on CPU for the demo).
 
-## Reproduce step 1
+## Reproduce
 
 ```bash
 python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# Step 1: download and check the data
 bash scripts/download_data.sh
 .venv/bin/python scripts/check_data.py
+# Step 2: group photos of the same leaf, split, train, evaluate
+.venv/bin/python scripts/dedup.py data/meta/plantvillage.csv data/raw/plantvillage \
+    --out data/meta/plantvillage_pairs.csv --min-corr 0.90
+.venv/bin/python scripts/verify_pairs.py data/meta/plantvillage_pairs.csv data/raw/plantvillage
+.venv/bin/python scripts/make_splits.py
+bash scripts/run_step2.sh
+.venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0 --set pv_test
 ```
+
+The committed split (`data/splits/plantvillage_grouped.csv`) can be used
+directly, which skips the three grouping scripts.
 
 ## Licenses and credit
 

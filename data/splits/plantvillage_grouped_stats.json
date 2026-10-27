@@ -1,0 +1,24 @@
+{
+  "images": 54305,
+  "groups": 19596,
+  "group_size": {
+    "max": 156,
+    "mean": 2.77,
+    "groups_over_20": 67
+  },
+  "linked_pairs": 1068,
+  "linked_pairs_with_different_labels": 2,
+  "split_images": {
+    "train": 38001,
+    "test": 8158,
+    "val": 8146
+  },
+  "split_classes": {
+    "train": 38,
+    "val": 38,
+    "test": 38
+  },
+  "groups_mixing_labels": 1,
+  "official_split_groups_crossing": 312,
+  "official_split_test_images_in_crossing_groups": 529
+}

@@ -1,0 +1,3 @@
+a,b,corr,flipped,label_a,label_b,inliers
+raw/color/Tomato___healthy/f48aed97-8db4-40a5-aa39-e2c3c70fe8be___GH_HL Leaf 524.1.JPG,raw/color/Tomato___Late_blight/cb3bd866-dd84-4f7e-9226-b4a2a2c7f2ae___GH_HL Leaf 173.2.JPG,0.9578,False,Tomato___healthy,Tomato___Late_blight,33
+raw/color/Tomato___Late_blight/cb3bd866-dd84-4f7e-9226-b4a2a2c7f2ae___GH_HL Leaf 173.2.JPG,raw/color/Tomato___healthy/1479f22a-c0d6-4dac-a752-578f575f276d___GH_HL Leaf 173.5.JPG,0.9728,False,Tomato___Late_blight,Tomato___healthy,26
