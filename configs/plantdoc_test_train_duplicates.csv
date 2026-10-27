@@ -15,3 +15,4 @@ test/Tomato leaf bacterial spot/tomato_V8.jpg,train/Tomato Septoria leaf spot/to
 test/Tomato leaf late blight/18c.jpg,train/Tomato leaf late blight/late_blight1.jpg,0,False,Tomato leaf late blight,Tomato leaf late blight,False,same image
 test/Tomato leaf yellow virus/tylcv-seminar-1-638.jpg,train/Tomato leaf yellow virus/tylcv-seminar-1-638.jpg,0,True,Tomato leaf yellow virus,Tomato leaf yellow virus,False,same image
 test/grape leaf/depositphotos_6898486-stock-photo-grape-leaves.jpg,train/grape leaf/grape-leave-clipping-path-3817989.jpg,6,False,grape leaf,grape leaf,False,"same drawing, edited (tendrils removed)"
+test/Potato leaf early blight/early-blight-alternaria-alternata-leaf-spotting-on-potato-leaf-X91XJE.jpg,train/Potato leaf early blight/early-blight-alternaria-alternata-leaf-spotting-on-potato-leaf-ACG5WF.jpg,,False,Potato leaf early blight,Potato leaf early blight,False,same image mirrored (found in step 4 by correlation + ORB)

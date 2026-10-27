@@ -74,8 +74,15 @@ example the same photo labelled "Corn Gray leaf spot" in one split and "Corn
 leaf blight" in the other, or Potato early blight vs late blight. The verified
 list is in `configs/plantdoc_test_train_duplicates.csv`.
 
+*Update (step 4):* the thumbnail-correlation + ORB check from step 2, run on
+all PlantDoc images, found every one of these pairs plus one more, a mirrored
+copy that pHash cannot match (potato early blight, same label). That makes
+**16 of 236 test images** (6.8%). The same check found 35 linked pairs that are
+one photo filed under two classes, 25 of them inside PlantDoc train (mostly
+potato/tomato early vs late blight); see [results_gap.md](results_gap.md).
+
 **Consequence:** PlantDoc results are reported on the full test set (for
-comparison with other work) and on the 221 test images that are not copies of
+comparison with other work) and on the 220 test images that are not copies of
 train images. Label noise in PlantDoc limits how high any model can score;
 this is stated next to every PlantDoc number.
 

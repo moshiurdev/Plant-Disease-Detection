@@ -1,7 +1,9 @@
 """Fine-tune an ImageNet backbone on PlantVillage (grouped split).
 
-The best epoch is chosen by validation macro-F1; the test set is not
-touched here (use scripts/evaluate.py once training is final).
+The best epoch is chosen by validation macro-F1 (PlantVillage val, or with
+--select-on plantdoc_val the validation split carved from PlantDoc train);
+the test sets are not touched here (use scripts/evaluate.py once training is
+final).
 
 Usage: python scripts/train.py --arch resnet18 --epochs 8 --out runs/pv_resnet18
 """
@@ -43,6 +45,8 @@ def main():
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--split-col", default="split", help="'split' (grouped) or 'official_split'")
+    ap.add_argument("--aug", default="default", choices=["default", "strong"])
+    ap.add_argument("--select-on", default="pv_val", choices=["pv_val", "plantdoc_val"])
     ap.add_argument("--limit", type=int, default=0, help="debug: use only N train images")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -54,7 +58,8 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     classes = data.plantvillage_classes()
-    train_ds = data.plantvillage_split("train", data.train_transform(args.size), args.split_col)
+    tf = data.strong_train_transform if args.aug == "strong" else data.train_transform
+    train_ds = data.plantvillage_split("train", tf(args.size), args.split_col)
     val_ds = data.plantvillage_split("val", data.eval_transform(args.size), args.split_col)
     if args.limit:
         rng = np.random.default_rng(args.seed)
@@ -66,6 +71,8 @@ def main():
               worker_init_fn=data.seed_worker)
     train_dl = DataLoader(train_ds, args.batch_size, shuffle=True, drop_last=True, **kw)
     val_dl = DataLoader(val_ds, 128, shuffle=False, **kw)
+    pd_dl = (DataLoader(data.plantdoc_split("val", data.eval_transform(args.size)), 64, shuffle=False, **kw)
+             if args.select_on == "plantdoc_val" else None)
 
     model = models.build(args.arch, len(classes)).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -97,14 +104,18 @@ def main():
         row = {"epoch": epoch, "train_loss": loss_sum / seen, "val_acc": m["accuracy"],
                "val_macro_f1": m["macro_f1"], "val_errors": m["errors"],
                "train_sec": round(train_time, 1), "img_per_sec": round(seen / train_time, 1)}
+        if pd_dl is not None:
+            mp = summarize(*predict(model, pd_dl, device), len(classes), n_boot=0)
+            row |= {"plantdoc_val_acc": mp["accuracy"], "plantdoc_val_macro_f1": mp["macro_f1"]}
+        score = row["plantdoc_val_macro_f1" if pd_dl is not None else "val_macro_f1"]
         history.append(row)
         print(json.dumps(row), flush=True)
-        if m["macro_f1"] > best:
-            best = m["macro_f1"]
+        if score > best:
+            best = score
             torch.save({"arch": args.arch, "classes": classes, "size": args.size, "epoch": epoch,
                         "state_dict": model.state_dict()}, out / "best.pt")
         json.dump(history, open(out / "history.json", "w"), indent=2)
-    best_row = max(history, key=lambda r: r["val_macro_f1"])
+    best_row = max(history, key=lambda r: r["plantdoc_val_macro_f1" if pd_dl is not None else "val_macro_f1"])
     json.dump(best_row, open(out / "best_val.json", "w"), indent=2)
     print("best", json.dumps(best_row))
 

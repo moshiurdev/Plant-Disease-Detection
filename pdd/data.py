@@ -47,6 +47,24 @@ def train_transform(size=224):
     ])
 
 
+def strong_train_transform(size=224):
+    """Heavier changes to how a photo looks (framing, colour, contrast, blur,
+    occlusion), meant to stop the model relying on PlantVillage's single
+    capture setting. Fixed before any step-4 result was seen."""
+    return T.Compose([
+        T.RandomResizedCrop(size, scale=(0.25, 1.0)),
+        T.RandomHorizontalFlip(),
+        T.RandomVerticalFlip(),
+        T.TrivialAugmentWide(),
+        T.ColorJitter(0.4, 0.4, 0.4, 0.05),
+        T.RandomGrayscale(0.05),
+        T.RandomApply([T.GaussianBlur(5, sigma=(0.1, 2.0))], p=0.3),
+        T.ToTensor(),
+        T.Normalize(MEAN, STD),
+        T.RandomErasing(p=0.25),
+    ])
+
+
 def eval_transform(size=224):
     return T.Compose([
         T.Resize(int(size * 256 / 224)),
@@ -60,6 +78,15 @@ def plantvillage_split(split, transform, split_col="split"):
     df = pd.read_csv(ROOT / "data/splits/plantvillage_grouped.csv", keep_default_na=False)
     df = df[df[split_col] == split]
     return ImageList(ROOT / "data/raw/plantvillage", df["path"], df["label"],
+                     plantvillage_classes(), transform)
+
+
+def plantdoc_split(split, transform):
+    """PlantDoc images of one split of data/splits/plantdoc_grouped.csv, labelled
+    with their PlantVillage class."""
+    df = pd.read_csv(ROOT / "data/splits/plantdoc_grouped.csv", keep_default_na=False)
+    df = df[df["split"] == split]
+    return ImageList(ROOT / "data/raw/plantdoc", df["path"], df["label"],
                      plantvillage_classes(), transform)
 
 

@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–3 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured). Closing the gap and the rice studies come next; nothing is reported here until it is measured.**
+**Status: steps 1–4 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed). The rice studies come next; nothing is reported here until it is measured.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -101,6 +101,36 @@ classes). Details: [docs/results_field.md](docs/results_field.md).
 - PlantDoc itself is web-collected: only 58% of its test images are real-scene
   photos.
 
+### Closing the gap (step 4)
+
+Two fixes, every choice made on a PlantDoc validation set carved from
+PlantDoc train (1,822 train / 456 val, grouped so copies stay together).
+PlantDoc test was scored once per run. Mean ± std over 3 seeds. Details:
+[docs/results_gap.md](docs/results_gap.md).
+
+| Start point | No PlantDoc images | 5 / class | 10 / class | 25 / class | All 1,822 |
+|---|---:|---:|---:|---:|---:|
+| ImageNet | – | 0.380 ± 0.010 | 0.442 ± 0.031 | 0.532 ± 0.021 | 0.624 ± 0.027 |
+| PlantVillage model | 0.309 | 0.472 ± 0.014 | 0.510 ± 0.024 | 0.581 ± 0.007 | **0.654 ± 0.022** |
+| PlantVillage, strong aug | 0.284 | 0.449 ± 0.037 | 0.489 ± 0.022 | 0.565 ± 0.018 | 0.668 ± 0.011 |
+
+*PlantDoc test accuracy (236 images).*
+
+- **Stronger augmentation on PlantVillage did not help** (0.309 → 0.284 test,
+  0.193 → 0.173 val macro-F1). A negative result.
+- **A few field photos help a lot**: 5 per class lifts accuracy from 0.31 to
+  0.47.
+- **Starting from the PlantVillage model beats ImageNet** for every k and
+  every seed on test. The benefit shrinks from about +0.09 at 5 per class to
+  +0.03 with all images.
+- Chosen on val: PlantVillage start, all images. The selected run gets 0.636
+  [0.572, 0.699] test accuracy, and 82% right crop.
+- **Cost:** that model forgets PlantVillage (0.997 → 0.546 PlantVillage test
+  accuracy; the 10 classes PlantDoc lacks are almost never predicted). It is a
+  28-class field model.
+- The gap is narrowed, not closed: about 0.65 on field photos vs 0.997 in the
+  lab.
+
 ## Plan
 
 | Step | What | Done when |
@@ -108,7 +138,7 @@ classes). Details: [docs/results_field.md](docs/results_field.md).
 | 1 | Download and check all data | Counts, checksums and leakage checks written to `docs/data.md` |
 | 2 | PlantVillage baselines (MobileNetV3 / EfficientNet / ResNet-18, ImageNet init) | In-domain test numbers on leaf-grouped splits |
 | 3 | Lab → field on PlantDoc test, error analysis | Field accuracy, per-class drops, failure examples |
-| 4 | Closing the gap: stronger augmentation, background handling, few-shot PlantDoc fine-tuning | Before/after table on PlantDoc test |
+| 4 | Closing the gap: stronger augmentation, few-shot PlantDoc fine-tuning | Before/after table on PlantDoc test |
 | 5 | Rice transfer: ImageNet vs PlantVillage init, 10/25/50/all per class | Learning curves with error bars |
 | 6 | Rice background shift (white ↔ field) | Cross-background table |
 | 7 | ONNX export, CPU timing, FastAPI demo (upload a leaf photo) | Demo runs on a laptop CPU |
@@ -133,6 +163,15 @@ bash scripts/run_step2.sh
 # Step 3: lab -> field (for each run)
 .venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0 --set plantdoc
 .venv/bin/python scripts/analyse_field.py runs/pv_efficientnet_b0 runs/pv_mobilenet_v3_large runs/pv_resnet18
+# Step 4: PlantDoc val split, strong augmentation, few-shot grid (about 4 h on an M1)
+.venv/bin/python scripts/make_plantdoc_splits.py
+.venv/bin/python scripts/train.py --arch efficientnet_b0 --epochs 6 --aug strong --select-on plantdoc_val \
+    --out runs/pv_efficientnet_b0_strong
+.venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0 --set plantdoc_val
+.venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0_strong --set plantdoc_val
+.venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0_strong --set plantdoc
+.venv/bin/python scripts/run_step4.py
+.venv/bin/python scripts/summarise_step4.py
 ```
 
 The committed split (`data/splits/plantvillage_grouped.csv`) can be used

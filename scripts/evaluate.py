@@ -6,6 +6,8 @@ Sets:
   plantdoc  PlantDoc official test, mapped to PlantVillage classes; also
             reported without the test images that duplicate PlantDoc train
             images (configs/plantdoc_test_train_duplicates.csv)
+  plantdoc_val  validation split carved from PlantDoc train
+            (data/splits/plantdoc_grouped.csv)
 
 Writes <run>/eval_<set>.json with accuracy, macro-F1 (95% bootstrap CIs),
 per-class recall and the confusion matrix, predictions as CSV and the raw
@@ -35,18 +37,18 @@ def load_set(name, classes, size):
         ds = data.plantvillage_split(name.split("_")[1], tf)
         return ds, None
     if name == "plantdoc":
-        df = pd.read_csv(ROOT / "data/meta/plantdoc.csv", keep_default_na=False)
-        df = df[df["split"] == "test"].reset_index(drop=True)
+        ds = data.plantdoc_split("test", tf)
         dups = set(pd.read_csv(ROOT / "configs/plantdoc_test_train_duplicates.csv")["test_path"])
-        ds = data.ImageList(ROOT / "data/raw/plantdoc", df["path"], df["plantvillage_class"], classes, tf)
-        return ds, ~df["path"].isin(dups).values
+        return ds, ~pd.Series(ds.paths).isin(dups).values
+    if name == "plantdoc_val":
+        return data.plantdoc_split("val", tf), None
     raise ValueError(name)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("run")
-    ap.add_argument("--set", default="pv_test", choices=["pv_test", "pv_val", "plantdoc"])
+    ap.add_argument("--set", default="pv_test", choices=["pv_test", "pv_val", "plantdoc", "plantdoc_val"])
     ap.add_argument("--workers", type=int, default=3)
     args = ap.parse_args()
     run = Path(args.run)

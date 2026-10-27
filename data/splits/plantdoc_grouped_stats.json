@@ -1,0 +1,36 @@
+{
+  "linked_pairs": 82,
+  "linked_pairs_with_different_labels": 35,
+  "split_images": {
+    "train": 1822,
+    "val": 456,
+    "test": 236,
+    "excluded_label_conflict": 47,
+    "excluded_dup_of_test": 17
+  },
+  "classes": {
+    "train": 28,
+    "val": 28,
+    "test": 27
+  },
+  "train_per_class": {
+    "count": 28.0,
+    "mean": 65.1,
+    "std": 26.9,
+    "min": 1.0,
+    "25%": 45.8,
+    "50%": 66.0,
+    "75%": 79.0,
+    "max": 142.0
+  },
+  "val_per_class": {
+    "count": 28.0,
+    "mean": 16.3,
+    "std": 6.7,
+    "min": 1.0,
+    "25%": 11.8,
+    "50%": 16.5,
+    "75%": 20.2,
+    "max": 36.0
+  }
+}

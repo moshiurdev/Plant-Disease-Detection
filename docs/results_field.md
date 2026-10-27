@@ -28,9 +28,9 @@ The PlantVillage ranking does not carry over. MobileNetV3 is highest on
 PlantDoc, but all three intervals overlap, so the field ranking is not clear
 either.
 
-Removing the 15 test images that duplicate PlantDoc train images
-([docs/data.md](data.md)) changes little: EfficientNet-B0 gets 0.317 on the
-remaining 221.
+Removing the 16 test images that duplicate PlantDoc train images
+([docs/data.md](data.md)) changes little: EfficientNet-B0 gets 0.314 on the
+remaining 220.
 
 ## Easier versions of the question (EfficientNet-B0)
 
