@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+
+# Datasets are downloaded by scripts; only small index files are committed.
+data/downloads/
+data/raw/
+data/meta/*.csv
+
+runs/
+checkpoints/
+*.pt
+*.onnx
+data/*.log

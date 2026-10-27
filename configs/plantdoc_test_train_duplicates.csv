@@ -1,0 +1,17 @@
+test_path,train_path,phash_distance,byte_identical,test_label,train_label,label_conflict,visual_check
+test/Blueberry leaf/blueberry-leaves-normal-above-and-iron-deficient-below-bgahf8.jpg,train/Blueberry leaf/blueberry-leaves-normal-above-and-iron-deficient-below-bgahf8.jpg,0,True,Blueberry leaf,Blueberry leaf,False,same image
+test/Corn Gray leaf spot/IMG_42231.jpg,train/Corn leaf blight/IMG_42231.jpg,0,True,Corn Gray leaf spot,Corn leaf blight,True,same image
+test/Corn leaf blight/2015070295153021.jpg,train/Corn Gray leaf spot/2015070295153021.jpg,0,True,Corn leaf blight,Corn Gray leaf spot,True,same image
+test/Corn leaf blight/corn-gray-leaf-spot-f4.jpg,train/Corn Gray leaf spot/corn-gray-leaf-spot-f4.jpg,0,True,Corn leaf blight,Corn Gray leaf spot,True,same image
+test/Potato leaf early blight/backus-056-potato-blight.jpg,train/Potato leaf late blight/backus-056-potato-blight.jpg,0,True,Potato leaf early blight,Potato leaf late blight,True,same image
+test/Potato leaf early blight/earlyblightpotato.jpg,train/Tomato Early blight leaf/earlyblightpotato.jpg,0,False,Potato leaf early blight,Tomato Early blight leaf,True,same image
+test/Potato leaf late blight/1421_0.jpeg?itok=FMtmgePj.jpg,train/Potato leaf early blight/1421_0.jpeg?itok=FMtmgePj.jpg,0,True,Potato leaf late blight,Potato leaf early blight,True,same image
+test/Potato leaf late blight/5816740026_d42ef24413_Phytophthora-Infestans.jpg,train/Potato leaf early blight/5816740026_d42ef24413_Phytophthora-Infestans.jpg,0,True,Potato leaf late blight,Potato leaf early blight,True,same image
+test/Potato leaf late blight/5816740026_d42ef24413_Phytophthora-Infestans.jpg,train/Tomato leaf late blight/tomato-late-blight-foliar-lesions_Scot-Nelson_CC-BY-SA-2.0.jpg,0,False,Potato leaf late blight,Tomato leaf late blight,True,same image
+test/Potato leaf late blight/irish-blight-symptoms-on-potato-leaves-atmf8b.jpg,train/Potato leaf early blight/irish-blight-symptoms-on-potato-leaves-atmf8b.jpg,0,True,Potato leaf late blight,Potato leaf early blight,True,same image
+test/Tomato Septoria leaf spot/early-blight-septoria-ls-fig-3.jpg,train/Tomato Septoria leaf spot/early-blight-septoria-ls-fig-3.jpg,0,True,Tomato Septoria leaf spot,Tomato Septoria leaf spot,False,same image
+test/Tomato leaf bacterial spot/07.17.18-Common_Tomato_Diseases_Canker-258x300.jpg,train/Tomato leaf bacterial spot/bacterial-canker3x2400-2ia1kgd.jpg,0,False,Tomato leaf bacterial spot,Tomato leaf bacterial spot,False,same image
+test/Tomato leaf bacterial spot/tomato_V8.jpg,train/Tomato Septoria leaf spot/tomato_V8.jpg,0,True,Tomato leaf bacterial spot,Tomato Septoria leaf spot,True,same image
+test/Tomato leaf late blight/18c.jpg,train/Tomato leaf late blight/late_blight1.jpg,0,False,Tomato leaf late blight,Tomato leaf late blight,False,same image
+test/Tomato leaf yellow virus/tylcv-seminar-1-638.jpg,train/Tomato leaf yellow virus/tylcv-seminar-1-638.jpg,0,True,Tomato leaf yellow virus,Tomato leaf yellow virus,False,same image
+test/grape leaf/depositphotos_6898486-stock-photo-grape-leaves.jpg,train/grape leaf/grape-leave-clipping-path-3817989.jpg,6,False,grape leaf,grape leaf,False,"same drawing, edited (tendrils removed)"
