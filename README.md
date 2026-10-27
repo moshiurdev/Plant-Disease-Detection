@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–2 of the plan done (data checked, PlantVillage baselines trained). Field and rice results come in later steps; nothing is reported here until it is measured.**
+**Status: steps 1–3 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured). Closing the gap and the rice studies come next; nothing is reported here until it is measured.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -76,7 +76,30 @@ Details and error analysis: [docs/results_pv.md](docs/results_pv.md).
 
 Lab photos are easy, so near-100% scores are expected here. The main
 remaining error is between the two corn leaf-spot diseases. These numbers say
-nothing yet about field photos; that is step 3.
+nothing about field photos; see below.
+
+### Lab → field on PlantDoc (step 3)
+
+The same models, unchanged, on PlantDoc test (236 web and field images, 27
+classes). Details: [docs/results_field.md](docs/results_field.md).
+
+| Model | PlantVillage test acc | PlantDoc test acc [95% CI] | PlantDoc macro-F1 [95% CI] |
+|---|---:|---|---|
+| ResNet-18 | 0.994 | 0.284 [0.229, 0.343] | 0.281 [0.221, 0.322] |
+| MobileNetV3-Large | 0.995 | 0.347 [0.288, 0.407] | 0.327 [0.263, 0.366] |
+| **EfficientNet-B0** (selected) | **0.997** | **0.309 [0.250, 0.364]** | **0.300 [0.239, 0.339]** |
+
+- Accuracy drops from above 99% to about 30%.
+- The selected model names the right crop only 54% of the time. It gets
+  healthy vs diseased right 86% of the time (always guessing "diseased" would
+  get 62%).
+- One class, "strawberry leaf scorch", absorbs 31 field photos with dark spots
+  or reddish colour, from many crops. PlantDoc has no such class.
+- **Background clutter is not the main cause.** Every test image's background
+  was labelled by eye. Clean leaves on white backgrounds score about the same
+  as real scenes (0.345 vs 0.309).
+- PlantDoc itself is web-collected: only 58% of its test images are real-scene
+  photos.
 
 ## Plan
 
@@ -107,6 +130,9 @@ bash scripts/download_data.sh
 .venv/bin/python scripts/make_splits.py
 bash scripts/run_step2.sh
 .venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0 --set pv_test
+# Step 3: lab -> field (for each run)
+.venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0 --set plantdoc
+.venv/bin/python scripts/analyse_field.py runs/pv_efficientnet_b0 runs/pv_mobilenet_v3_large runs/pv_resnet18
 ```
 
 The committed split (`data/splits/plantvillage_grouped.csv`) can be used

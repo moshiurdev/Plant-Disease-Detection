@@ -8,7 +8,8 @@ Sets:
             images (configs/plantdoc_test_train_duplicates.csv)
 
 Writes <run>/eval_<set>.json with accuracy, macro-F1 (95% bootstrap CIs),
-per-class recall and the confusion matrix, plus predictions as CSV.
+per-class recall and the confusion matrix, predictions as CSV and the raw
+logits as .npy (for scripts/analyse_field.py).
 
 Usage: python scripts/evaluate.py runs/pv_resnet18 --set pv_test
 """
@@ -17,6 +18,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
@@ -57,12 +59,14 @@ def main():
 
     ds, clean_mask = load_set(args.set, classes, size)
     dl = DataLoader(ds, 128, shuffle=False, num_workers=args.workers)
-    ys, ps = [], []
+    ys, zs = [], []
     with torch.no_grad():
         for x, y in dl:
-            ps.append(model(x.to(device)).argmax(1).cpu())
+            zs.append(model(x.to(device)).float().cpu())
             ys.append(y)
-    y, p = torch.cat(ys).numpy(), torch.cat(ps).numpy()
+    y, z = torch.cat(ys).numpy(), torch.cat(zs).numpy()
+    p = z.argmax(1)
+    np.save(run / f"logits_{args.set}.npy", z)
 
     res = {"run": str(run), "arch": ck["arch"], "epoch": ck["epoch"], "set": args.set,
            "classes": classes, "all": summarize(y, p, len(classes))}
