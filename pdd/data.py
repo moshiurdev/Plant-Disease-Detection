@@ -90,5 +90,33 @@ def plantdoc_split(split, transform):
                      plantvillage_classes(), transform)
 
 
+RICE_SIZE = (256, 128)  # height x width: rice leaves are long and thin
+
+
+def rice_classes():
+    df = pd.read_csv(ROOT / "data/meta/dhan_cached.csv", usecols=["label"])
+    return sorted(df["label"].unique())
+
+
+def rice_train_transform(size=RICE_SIZE):
+    return T.Compose([
+        T.RandomResizedCrop(size, scale=(0.6, 1.0), ratio=(0.4, 0.6)),
+        T.RandomHorizontalFlip(),
+        T.RandomVerticalFlip(),
+        T.ColorJitter(0.2, 0.2, 0.2, 0.02),
+        T.ToTensor(),
+        T.Normalize(MEAN, STD),
+    ])
+
+
+def rice_eval_transform(size=RICE_SIZE):
+    return T.Compose([T.Resize(size), T.ToTensor(), T.Normalize(MEAN, STD)])
+
+
+def rice_list(df, transform):
+    """Cached Dhan-Shomadhan images (scripts/cache_rice.py) listed in df."""
+    return ImageList(ROOT / "data/cache/dhan_shomadhan", df["path"], df["label"], rice_classes(), transform)
+
+
 def seed_worker(worker_id):
     torch.manual_seed(torch.initial_seed() % 2**31 + worker_id)

@@ -1,0 +1,94 @@
+{
+ "rules": {
+  "field": [
+   20,
+   15
+  ],
+  "white": [
+   1000000000,
+   1000000000
+  ]
+ },
+ "linked_pairs": {
+  "field": 23,
+  "white": 0
+ },
+ "linked_pairs_different_label": 0,
+ "groups": 1087,
+ "groups_with_more_than_one_image": 16,
+ "images_in_such_groups": 35,
+ "largest_group": 4,
+ "groups_with_mixed_labels": 0,
+ "repeats": {
+  "r0": {
+   "pool": {
+    "white": 492,
+    "field": 216
+   },
+   "val": {
+    "white": 123,
+    "field": 54
+   },
+   "test": {
+    "white": 154,
+    "field": 67
+   }
+  },
+  "r1": {
+   "pool": {
+    "white": 491,
+    "field": 217
+   },
+   "val": {
+    "white": 124,
+    "field": 53
+   },
+   "test": {
+    "white": 154,
+    "field": 67
+   }
+  },
+  "r2": {
+   "pool": {
+    "white": 492,
+    "field": 214
+   },
+   "val": {
+    "white": 123,
+    "field": 55
+   },
+   "test": {
+    "white": 154,
+    "field": 68
+   }
+  },
+  "r3": {
+   "pool": {
+    "white": 493,
+    "field": 215
+   },
+   "val": {
+    "white": 123,
+    "field": 54
+   },
+   "test": {
+    "white": 153,
+    "field": 68
+   }
+  },
+  "r4": {
+   "pool": {
+    "white": 491,
+    "field": 216
+   },
+   "val": {
+    "white": 123,
+    "field": 54
+   },
+   "test": {
+    "white": 155,
+    "field": 67
+   }
+  }
+ }
+}

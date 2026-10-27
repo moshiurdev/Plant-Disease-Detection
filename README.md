@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–4 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed). The rice studies come next; nothing is reported here until it is measured.**
+**Status: steps 1–5 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer measured). The rice background study comes next; nothing is reported here until it is measured.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -131,6 +131,31 @@ PlantDoc test was scored once per run. Mean ± std over 3 seeds. Details:
 - The gap is narrowed, not closed: about 0.65 on field photos vs 0.997 in the
   lab.
 
+### Rice transfer (step 5)
+
+Dhan-Shomadhan, 5 rice diseases, ImageNet start vs PlantVillage start. Mean ±
+std over 5 repeated grouped splits (221 test images each). Learning rate and
+checkpoint chosen on val. Details: [docs/rice.md](docs/rice.md).
+
+| Labelled photos / class | ImageNet start | PlantVillage start | PV better in |
+|---:|---:|---:|---:|
+| 10 | 0.519 ± 0.030 | 0.553 ± 0.021 | 4 / 5 repeats |
+| 25 | 0.625 ± 0.063 | 0.635 ± 0.026 | 2 / 5 |
+| 50 | 0.696 ± 0.047 | 0.705 ± 0.027 | 2 / 5 |
+| all (~140) | 0.780 ± 0.021 | 0.775 ± 0.025 | 1 / 5 |
+
+*Rice test accuracy.*
+
+- **The PlantVillage start helps only at 10 photos per class (+0.03), and
+  not on field photos.** From 25 per class on there is no clear difference.
+  Lab photos of other crops add little for rice beyond ImageNet.
+- More labelled photos matter far more than the starting point.
+- Field photos are much harder than white-background photos (about 0.67 vs
+  0.82 with all labels).
+- Repeated shots were grouped for field photos. On white backgrounds,
+  keypoint matching fails on parallel leaf veins, and no copies were found
+  by other checks.
+
 ## Plan
 
 | Step | What | Done when |
@@ -172,6 +197,12 @@ bash scripts/run_step2.sh
 .venv/bin/python scripts/evaluate.py runs/pv_efficientnet_b0_strong --set plantdoc
 .venv/bin/python scripts/run_step4.py
 .venv/bin/python scripts/summarise_step4.py
+# Step 5: rice cache, repeated-shot grouping, 5 repeated splits, grid (about 3 h)
+.venv/bin/python scripts/cache_rice.py
+.venv/bin/python scripts/rice_pairs.py
+.venv/bin/python scripts/make_rice_splits.py
+.venv/bin/python scripts/run_step5.py
+.venv/bin/python scripts/summarise_step5.py
 ```
 
 The committed split (`data/splits/plantvillage_grouped.csv`) can be used
