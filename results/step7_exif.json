@@ -1,0 +1,32 @@
+{
+ "plantdoc_train_files": 2342,
+ "plantdoc_train_orientation_counts": {
+  "1": 2316,
+  "6": 18,
+  "8": 5,
+  "3": 3
+ },
+ "plantdoc_test_files": 236,
+ "plantdoc_test_orientation_counts": {
+  "1": 233,
+  "6": 3
+ },
+ "plantvillage_test_files": 8158,
+ "plantvillage_test_tagged": 0,
+ "plantdoc_test": {
+  "field": {
+   "accuracy_as_stored": 0.635593220338983,
+   "accuracy_upright": 0.6313559322033898,
+   "predictions_changed": 2,
+   "rotated_correct_as_stored": 2,
+   "rotated_correct_upright": 1
+  },
+  "lab": {
+   "accuracy_as_stored": 0.3093220338983051,
+   "accuracy_upright": 0.3050847457627119,
+   "predictions_changed": 1,
+   "rotated_correct_as_stored": 1,
+   "rotated_correct_upright": 0
+  }
+ }
+}

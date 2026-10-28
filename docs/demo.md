@@ -43,10 +43,46 @@ evaluation, and checks ONNX Runtime against PyTorch:
 \* The first 1,000 PlantVillage test images by path (accuracy 0.989 on that
 subset; 0.997 on the full test set).
 
+This check ran the demo's preprocessing without the EXIF rotation step that
+the demo applies to lab and field uploads. See "Photo rotation" below.
+
 For rice, the demo also repeats the image caching from training
 (`scripts/cache_rice.py`): turn upright, rotate to portrait, scale to 224 px
 wide. Training images were decoded with JPEG draft mode, so a full-size phone
 photo can differ very slightly from its cached copy.
+
+## Photo rotation (EXIF)
+
+Phone photos often store the pixels sideways, plus a tag that says how to turn
+them upright. The demo applies that tag before predicting, which is the right
+thing for a new phone photo. Training and evaluation of the lab and field
+models did not apply it (`pdd/data.py` opens images as stored), so a tagged
+photo was learned and scored sideways. The rice model applies the tag in both
+training and the demo, so it is not affected.
+
+`scripts/check_exif.py` measures this (`results/step7_exif.json`):
+
+- PlantVillage test: 0 of 8,158 photos have a rotation tag.
+- PlantDoc train folder: 26 of 2,342 photos are tagged (18 + 5 turned a
+  quarter turn, 3 upside down).
+- PlantDoc test: 3 of 236 photos are tagged (all a quarter turn).
+
+PlantDoc test accuracy, scored as stored (as in evaluation) and upright (as
+in the demo):
+
+| Model | As stored | Upright | Predictions that change |
+|---|---:|---:|---:|
+| field | 0.636 (150 / 236) | 0.631 (149 / 236) | 2 |
+| lab | 0.309 (73 / 236) | 0.305 (72 / 236) | 1 |
+
+The reported scores are those of the stored orientation. On the 3 tagged
+photos, the field model gets 2 right as stored and 1 upright, and the lab model
+gets 1 right as stored and 0 upright. One photo changes from right to wrong for
+each model: the field model's is a tomato early blight photo, which the demo
+calls bacterial spot. With 3 photos this says nothing general about rotation;
+it only means the demo's answer for a tagged photo can differ from the one
+counted in the evaluation. A fix would be to apply the tag in training as well
+and retrain, which was not done.
 
 ## CPU timing
 

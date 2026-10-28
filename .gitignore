@@ -16,3 +16,6 @@ checkpoints/
 data/*.log
 data/meta/*.npy
 data/cache/
+
+# Sample photos copied from the datasets for trying the demo
+test_photos/
