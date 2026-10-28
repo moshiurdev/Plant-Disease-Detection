@@ -10,3 +10,11 @@ scikit-learn==1.9.1
 torch==2.14.1
 torchvision==0.29.1
 matplotlib==3.11.2
+# ONNX export, CPU demo and tests (step 7)
+onnx==1.23.2
+onnxruntime==1.31.1
+fastapi==0.162.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+httpx==0.28.1
+pytest==9.2.0

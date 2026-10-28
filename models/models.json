@@ -1,0 +1,253 @@
+{
+ "created_with": {
+  "torch": "2.14.1",
+  "onnxruntime": "1.31.1",
+  "cpu": "arm",
+  "cpu_count": 8
+ },
+ "models": {
+  "lab": {
+   "file": "lab.onnx",
+   "sha256": "0224de992070011aa19a542aed0797a8abcb14df8ba65c4995e546f212f930ca",
+   "size_mb": 16.2,
+   "title": "Lab model (PlantVillage, 38 classes)",
+   "note": "Trained on PlantVillage lab photos only. Near-perfect on lab photos, about 31% on field photos.",
+   "source_run": "runs/pv_efficientnet_b0",
+   "arch": "efficientnet_b0",
+   "input": {
+    "kind": "leaf",
+    "height": 160,
+    "width": 160,
+    "mean": [
+     0.48500001430511475,
+     0.4560000002384186,
+     0.4059999883174896
+    ],
+    "std": [
+     0.2290000021457672,
+     0.2240000069141388,
+     0.22499999403953552
+    ]
+   },
+   "classes": [
+    "Apple___Apple_scab",
+    "Apple___Black_rot",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Blueberry___healthy",
+    "Cherry_(including_sour)___Powdery_mildew",
+    "Cherry_(including_sour)___healthy",
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+    "Corn_(maize)___Common_rust_",
+    "Corn_(maize)___Northern_Leaf_Blight",
+    "Corn_(maize)___healthy",
+    "Grape___Black_rot",
+    "Grape___Esca_(Black_Measles)",
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+    "Grape___healthy",
+    "Orange___Haunglongbing_(Citrus_greening)",
+    "Peach___Bacterial_spot",
+    "Peach___healthy",
+    "Pepper,_bell___Bacterial_spot",
+    "Pepper,_bell___healthy",
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy",
+    "Raspberry___healthy",
+    "Soybean___healthy",
+    "Squash___Powdery_mildew",
+    "Strawberry___Leaf_scorch",
+    "Strawberry___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites Two-spotted_spider_mite",
+    "Tomato___Target_Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+   ],
+   "allowed_classes": null,
+   "scores": {
+    "plantvillage_test_acc": 0.997180681539593,
+    "plantdoc_test_acc": 0.3093220338983051
+   },
+   "checks": {
+    "max_preprocess_diff": 0.0,
+    "max_logit_diff": 1.9073486328125e-06,
+    "test_images_checked": 1000,
+    "prediction_agreement_with_pytorch": 1.0,
+    "onnx_accuracy_on_checked_images": 0.989
+   },
+   "cpu_latency_ms": {
+    "1_thread_median": 14.604979020077735,
+    "1_thread_p90": 14.772783790249377,
+    "all_threads_median": 5.108417011797428,
+    "all_threads_p90": 5.6779665639624
+   }
+  },
+  "field": {
+   "file": "field.onnx",
+   "sha256": "391e9a0ec3075cf593a531491897b3e00e23301ee03c1a8193da4c4614e066db",
+   "size_mb": 16.2,
+   "title": "Field model (PlantDoc, 28 classes)",
+   "note": "PlantVillage model fine-tuned on PlantDoc field/web photos. About 64% on field photos; forgets lab photos and the 10 classes PlantDoc lacks.",
+   "source_run": "runs/ft/pv_kall_s1",
+   "arch": "efficientnet_b0",
+   "input": {
+    "kind": "leaf",
+    "height": 160,
+    "width": 160,
+    "mean": [
+     0.48500001430511475,
+     0.4560000002384186,
+     0.4059999883174896
+    ],
+    "std": [
+     0.2290000021457672,
+     0.2240000069141388,
+     0.22499999403953552
+    ]
+   },
+   "classes": [
+    "Apple___Apple_scab",
+    "Apple___Black_rot",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Blueberry___healthy",
+    "Cherry_(including_sour)___Powdery_mildew",
+    "Cherry_(including_sour)___healthy",
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+    "Corn_(maize)___Common_rust_",
+    "Corn_(maize)___Northern_Leaf_Blight",
+    "Corn_(maize)___healthy",
+    "Grape___Black_rot",
+    "Grape___Esca_(Black_Measles)",
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+    "Grape___healthy",
+    "Orange___Haunglongbing_(Citrus_greening)",
+    "Peach___Bacterial_spot",
+    "Peach___healthy",
+    "Pepper,_bell___Bacterial_spot",
+    "Pepper,_bell___healthy",
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy",
+    "Raspberry___healthy",
+    "Soybean___healthy",
+    "Squash___Powdery_mildew",
+    "Strawberry___Leaf_scorch",
+    "Strawberry___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites Two-spotted_spider_mite",
+    "Tomato___Target_Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+   ],
+   "allowed_classes": [
+    "Apple___Apple_scab",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Blueberry___healthy",
+    "Cherry_(including_sour)___healthy",
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+    "Corn_(maize)___Common_rust_",
+    "Corn_(maize)___Northern_Leaf_Blight",
+    "Grape___Black_rot",
+    "Grape___healthy",
+    "Peach___healthy",
+    "Pepper,_bell___Bacterial_spot",
+    "Pepper,_bell___healthy",
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Raspberry___healthy",
+    "Soybean___healthy",
+    "Squash___Powdery_mildew",
+    "Strawberry___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites Two-spotted_spider_mite",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+   ],
+   "scores": {
+    "plantdoc_test_acc": 0.635593220338983,
+    "plantvillage_test_acc": 0.5460897278744791
+   },
+   "checks": {
+    "max_preprocess_diff": 0.0,
+    "max_logit_diff": 7.62939453125e-06,
+    "test_images_checked": 236,
+    "prediction_agreement_with_pytorch": 1.0,
+    "onnx_accuracy_on_checked_images": 0.635593220338983
+   },
+   "cpu_latency_ms": {
+    "1_thread_median": 14.606791490223259,
+    "1_thread_p90": 14.773270883597434,
+    "all_threads_median": 5.116499960422516,
+    "all_threads_p90": 5.601853772532195
+   }
+  },
+  "rice": {
+   "file": "rice.onnx",
+   "sha256": "c3b5780ba5cfbcdc53767a0fc11dfab0e65519a9772ca1bc33018e262c612f2a",
+   "size_mb": 16.0,
+   "title": "Rice model (Dhan-Shomadhan, 5 diseases)",
+   "note": "Bangladeshi rice leaves, white-sheet and field photos. About 80% on its test split; weaker on field photos.",
+   "source_run": "runs/rice/imagenet_kall_r4",
+   "arch": "efficientnet_b0",
+   "input": {
+    "kind": "rice",
+    "height": 256,
+    "width": 128,
+    "mean": [
+     0.48500001430511475,
+     0.4560000002384186,
+     0.4059999883174896
+    ],
+    "std": [
+     0.2290000021457672,
+     0.2240000069141388,
+     0.22499999403953552
+    ]
+   },
+   "classes": [
+    "brown_spot",
+    "leaf_scald",
+    "rice_blast",
+    "rice_tungro",
+    "sheath_blight"
+   ],
+   "allowed_classes": null,
+   "scores": {
+    "rice_test_acc": 0.7972972972972973,
+    "rice_test_acc_white": 0.8064516129032258,
+    "rice_test_acc_field": 0.7761194029850746
+   },
+   "checks": {
+    "max_preprocess_diff": 0.0,
+    "max_logit_diff": 1.0132789611816406e-05,
+    "test_images_checked": 222,
+    "prediction_agreement_with_pytorch": 1.0,
+    "onnx_accuracy_on_checked_images": 0.7972972972972973
+   },
+   "cpu_latency_ms": {
+    "1_thread_median": 17.98106246860698,
+    "1_thread_p90": 18.71108361519873,
+    "all_threads_median": 5.901021009776741,
+    "all_threads_p90": 6.371525535359979
+   }
+  }
+ }
+}

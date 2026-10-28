@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–6 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer and rice background shift measured). The ONNX demo and release come next; nothing is reported here until it is measured.**
+**Status: steps 1–7 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer and background shift measured, ONNX CPU demo built). The final write-up and release come next.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -177,6 +177,27 @@ chosen on val of the training background. Details:
 - The same lesson as PlantVillage → PlantDoc, inside one rice dataset: photos
   from the target setting are needed in training.
 
+### CPU demo (step 7)
+
+Three models, each chosen on validation, exported to ONNX and served by a
+FastAPI upload page. Runs on a laptop CPU without PyTorch. Details:
+[docs/demo.md](docs/demo.md).
+
+| Model | Classes | Test accuracy | CPU time per image (M1, 1 thread / all) |
+|---|---:|---|---:|
+| lab | 38 | 0.997 PlantVillage, 0.309 PlantDoc | 14.6 / 5.1 ms |
+| field | 28 | 0.636 PlantDoc | 14.6 / 5.1 ms |
+| rice | 5 | 0.797 (one split; 5-split mean 0.780) | 18.0 / 5.9 ms |
+
+The ONNX models give the same prediction as PyTorch on every test image
+checked (1,458 images), and the demo's numpy preprocessing matches the
+training transforms exactly.
+
+```bash
+.venv/bin/pip install -r requirements-demo.txt
+.venv/bin/uvicorn app.main:app --port 8000   # needs models/*.onnx (export or release)
+```
+
 ## Plan
 
 | Step | What | Done when |
@@ -227,6 +248,9 @@ bash scripts/run_step2.sh
 # Step 6: rice background shift (about 1 h)
 .venv/bin/python scripts/run_step6.py
 .venv/bin/python scripts/summarise_step6.py
+# Step 7: ONNX export with checks and CPU timing, demo tests
+.venv/bin/python scripts/export_onnx.py
+.venv/bin/python -m pytest tests -q
 ```
 
 The committed split (`data/splits/plantvillage_grouped.csv`) can be used

@@ -1,0 +1,7 @@
+# Only what the CPU demo needs (app/main.py); no PyTorch.
+numpy==2.5.4
+pillow==13.0.0
+onnxruntime==1.31.1
+fastapi==0.162.0
+uvicorn==0.54.0
+python-multipart==0.0.32
