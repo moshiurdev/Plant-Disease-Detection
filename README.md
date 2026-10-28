@@ -232,6 +232,16 @@ gh release download v1.0 -R moshiurdev/Plant-Disease-Detection -p "*.onnx" -D mo
 Without `gh`, download `lab.onnx`, `field.onnx` and `rice.onnx` from the
 release page into `models/`. `models/models.json` lists their SHA-256.
 
+Screenshots of the demo with the field model:
+
+| Right | Wrong | Outside the datasets |
+|---|---|---|
+| ![Grape black rot photo, predicted Grape: Black rot at 93%](docs/images/demo_grape_black_rot.webp) | ![Apple scab photo, predicted Apple: Cedar apple rust at 59%](docs/images/demo_apple_scab_wrong.webp) | ![Grass-like leaf with brown spots, predicted Corn: Cercospora leaf spot at 71%](docs/images/demo_outside_photo.webp) |
+| PlantDoc test photo of grape black rot: Grape: Black rot, 93%. | PlantDoc test photo of apple scab: Apple: Cedar apple rust, 59% (scab second, 25%). This one is also wrong in the evaluation. | A photo not from any dataset; its true disease is not known. The model still answers with one of its 28 classes, at 71%. |
+
+The third case shows the limit noted below: every model picks one of its
+classes, with no "not sure" or "not a leaf I know" answer.
+
 ## Limitations
 
 - **Small field test sets.** PlantDoc test has 236 images (4–12 per class),
@@ -329,6 +339,8 @@ directly, which skips the three grouping scripts.
 
 Code in this repository: MIT. The datasets keep their own licenses (above) and
 are not redistributed here; the scripts download them from the original sources.
+The demo screenshots in `docs/images/` show two PlantDoc test photos
+(CC BY 4.0, Singh et al.).
 
 The released model files are trained on these datasets, starting from
 torchvision's ImageNet weights:
