@@ -1,6 +1,6 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–5 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer measured). The rice background study comes next; nothing is reported here until it is measured.**
+**Status: steps 1–6 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer and rice background shift measured). The ONNX demo and release come next; nothing is reported here until it is measured.**
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -156,6 +156,27 @@ checkpoint chosen on val. Details: [docs/rice.md](docs/rice.md).
   keypoint matching fails on parallel leaf veins, and no copies were found
   by other checks.
 
+### Rice background shift (step 6)
+
+Train on one background, test on both. ImageNet start, 5 repeats, checkpoint
+chosen on val of the training background. Details:
+[docs/rice_background.md](docs/rice_background.md).
+
+| Trained on | White test acc | Field test acc |
+|---|---:|---:|
+| White (~492 images) | **0.788 ± 0.038** | 0.261 ± 0.047 |
+| White, 40 / class (200) | 0.712 ± 0.020 | 0.258 ± 0.045 |
+| Field (~216 images) | 0.232 ± 0.073 | **0.593 ± 0.062** |
+| Both (step 5) | 0.826 ± 0.026 | 0.674 ± 0.064 |
+
+- **Across backgrounds the models are near guessing** (largest class: 0.28
+  white, 0.22 field) and fall back on one or two classes.
+- Not a data-size effect: 200 white images give the same field score.
+- **Training on both backgrounds helps both**, field most (+0.08, higher in
+  all 5 repeats).
+- The same lesson as PlantVillage → PlantDoc, inside one rice dataset: photos
+  from the target setting are needed in training.
+
 ## Plan
 
 | Step | What | Done when |
@@ -203,6 +224,9 @@ bash scripts/run_step2.sh
 .venv/bin/python scripts/make_rice_splits.py
 .venv/bin/python scripts/run_step5.py
 .venv/bin/python scripts/summarise_step5.py
+# Step 6: rice background shift (about 1 h)
+.venv/bin/python scripts/run_step6.py
+.venv/bin/python scripts/summarise_step6.py
 ```
 
 The committed split (`data/splits/plantvillage_grouped.csv`) can be used
