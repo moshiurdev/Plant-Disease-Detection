@@ -1,6 +1,8 @@
 # Plant Disease Detection: from lab photos to real fields and to Bangladeshi rice
 
-**Status: steps 1–7 of the plan done (data checked, PlantVillage baselines trained, lab → field gap measured and partly closed, rice transfer and background shift measured, ONNX CPU demo built). The final write-up and release come next.**
+**Status: complete (v1.0).** Every number below is produced by a script in
+this repository; models are on the
+[v1.0 release](https://github.com/moshiurdev/Plant-Disease-Detection/releases/tag/v1.0).
 
 Plant disease classifiers often score close to 100% on PlantVillage, but those
 photos are single leaves on a plain background in a lab. Farmers take photos in
@@ -9,6 +11,30 @@ measures how much accuracy is lost when a model trained on lab photos meets
 field photos, tries simple ways to close that gap, and asks whether what the
 model learned helps on a crop it has never seen (rice from Bangladesh) when
 only a few labelled photos are available.
+
+## Main findings
+
+1. **Lab → field: 0.997 → 0.309.** An EfficientNet-B0 that is near perfect on
+   PlantVillage lab photos gets 31% on PlantDoc field/web photos of the same
+   classes. Background clutter is not the main cause: clean leaves on white
+   are about as hard as real scenes.
+2. **Field photos fix more than augmentation.** Much stronger appearance
+   augmentation made field accuracy slightly *worse* (0.284). Fine-tuning on
+   5 PlantDoc photos per class lifts it to 0.47, and on all 1,822 to 0.65.
+   Starting from the PlantVillage model beats ImageNet at every amount of
+   field data. The fine-tuned model forgets lab photos (0.997 → 0.546).
+3. **PlantVillage → rice: little transfer.** On Bangladeshi rice, a
+   PlantVillage start beats ImageNet only with 10 labelled photos per class
+   (+0.03), and not from 25 on. More labels matter far more (0.52 → 0.78).
+4. **White sheet ↔ field rice photos: near guessing.** A rice model trained on
+   one background scores 0.23–0.26 on the other. Training on both backgrounds
+   helps both. Same lesson as point 1: photos from the target setting must be
+   in training.
+5. **Runs on a laptop CPU.** Three ONNX models (lab, field, rice), about 15 ms
+   per image on one M1 core, behind a FastAPI upload page.
+
+Negative and mixed results are reported as they came out. All model choices
+were made on validation data.
 
 ## Research questions
 
@@ -50,17 +76,21 @@ measured by a script in this repository.
   groups are split 70/15/15 (train/val/test) so no leaf is on two sides
   ([docs/splits.md](docs/splits.md)). Measured this way, the official split
   puts about 5% of its test images on leaves that are also in train.
-- **PlantDoc:** its official test set is the field test set. PlantDoc is never
-  used for model selection in question 1. Images in PlantDoc test that are near
-  copies of PlantDoc train images or of PlantVillage images are reported and
-  scored separately.
-- **Dhan-Shomadhan:** small, so every rice result is averaged over repeated
-  splits and seeds and reported as mean ± standard deviation. Near-duplicate
-  photos are kept in the same fold.
+- **PlantDoc:** its official test set is the field test set and is never used
+  for any choice. Step 4 selects on a validation set carved from PlantDoc
+  train, grouped by near duplicates, with photos that copy a test image or
+  carry conflicting labels removed. The 16 test images that copy PlantDoc
+  train images are also scored separately. No PlantDoc image copies a
+  PlantVillage image.
+- **Dhan-Shomadhan:** small, so every rice result is averaged over 5 repeated
+  grouped splits (each with its own seed) and reported as mean ± standard
+  deviation. Repeated shots of the same field plant are kept on one side.
+  On white backgrounds no repeated shots could be detected (see
+  [docs/rice.md](docs/rice.md)).
 - **Metrics:** accuracy and macro-F1 (classes are imbalanced), per-class recall
   and confusion matrices.
 
-## Results so far
+## Results
 
 ### PlantVillage, in-domain (step 2)
 
@@ -195,7 +225,44 @@ training transforms exactly.
 
 ```bash
 .venv/bin/pip install -r requirements-demo.txt
-.venv/bin/uvicorn app.main:app --port 8000   # needs models/*.onnx (export or release)
+gh release download v1.0 -R moshiurdev/Plant-Disease-Detection -p "*.onnx" -D models
+.venv/bin/uvicorn app.main:app --port 8000   # then open http://localhost:8000
+```
+
+Without `gh`, download `lab.onnx`, `field.onnx` and `rice.onnx` from the
+release page into `models/`. `models/models.json` lists their SHA-256.
+
+## Limitations
+
+- **Small field test sets.** PlantDoc test has 236 images (4–12 per class),
+  so accuracy intervals are about ±0.06. Rice test splits have 221 images, 67
+  of them field photos.
+- **PlantDoc is web-collected and noisy.** Only 58% of its test images are
+  real-scene photos, and 35 duplicate pairs carry conflicting labels.
+  "Field accuracy" here means accuracy on web photos of leaves.
+- **Limited search.** One main architecture (EfficientNet-B0), small
+  inputs (160 px; 256 × 128 for rice), three learning rates (the largest won
+  each time), fixed training lengths, 3 seeds (PlantDoc) or 5 repeats (rice).
+  Larger models or inputs might do better. The ranking of the PlantVillage
+  baselines did not carry over to the field.
+- **Possible shortcuts in rice.** Within a disease, white-sheet photos often share a
+  framing, and white-background repeated shots could not be detected. Rice
+  scores may partly reflect how photos were taken.
+- **No location or time split.** None of the datasets records farm, date or
+  device, so no split tests a new farm or season.
+- **The demo is not a diagnosis tool.** Probabilities are not calibrated, and
+  every model answers with one of its classes even for an unrelated photo.
+
+## Repository layout
+
+```
+pdd/        datasets, transforms, models, metrics, numpy preprocessing for ONNX
+scripts/    data checks, grouping and splits, training, evaluation, step grids, export
+configs/    PlantDoc → PlantVillage class map, duplicate list, background labels
+data/splits committed grouped splits (PlantVillage, PlantDoc, rice)
+results/    JSON results behind every table
+docs/       one page per step with method, full tables and error analysis
+app/        FastAPI demo;  tests/  demo tests;  models/  ONNX metadata (files in release)
 ```
 
 ## Plan
@@ -209,7 +276,9 @@ training transforms exactly.
 | 5 | Rice transfer: ImageNet vs PlantVillage init, 10/25/50/all per class | Learning curves with error bars |
 | 6 | Rice background shift (white ↔ field) | Cross-background table |
 | 7 | ONNX export, CPU timing, FastAPI demo (upload a leaf photo) | Demo runs on a laptop CPU |
-| 8 | README with final results and limitations, GitHub release | Repo public (only after asking) |
+| 8 | README with final results and limitations, GitHub release | Repo public, v1.0 release with the ONNX models |
+
+All eight steps are done.
 
 Hardware: Apple M1, 8 GB RAM (PyTorch MPS for training, ONNX Runtime on CPU for the demo).
 
@@ -260,5 +329,14 @@ directly, which skips the three grouping scripts.
 
 Code in this repository: MIT. The datasets keep their own licenses (above) and
 are not redistributed here; the scripts download them from the original sources.
-PlantVillage is CC BY-SA 3.0, so any images or derived datasets shared from it
-must keep that license.
+
+The released model files are trained on these datasets, starting from
+torchvision's ImageNet weights:
+- `lab.onnx` and `field.onnx` are trained on PlantVillage (CC BY-SA 3.0), and
+  `field.onnx` also on PlantDoc (CC BY 4.0). They are shared under
+  CC BY-SA 3.0, crediting PlantVillage (Hughes & Salathé; Mohanty et al.)
+  and PlantDoc (Singh et al.).
+- `rice.onnx` is trained on Dhan-Shomadhan (CC BY 4.0), crediting Hossain et
+  al., Daffodil International University.
+- The ImageNet starting weights come with their own terms; check them before
+  any commercial use. The models are meant for research and teaching.
